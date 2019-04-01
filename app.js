@@ -1,7 +1,7 @@
 
 var x = -275,
-    y =  175;
-
+    y =  175,
+    z =   10;
 
 let img;
 function preload(){
@@ -30,12 +30,17 @@ function Input(){
 
 function draw() {
 
+    let camY = map(mouseY, 0, width, -200, 0);
+    let camX = map(mouseX, 0, width, -200, 0);
+    //camera(camX, camY, (height/2) / tan(PI/6), x, y, z, 0, 1, 0);
+    camera(camX, camY, (height/2) / tan(PI/6), x, y, z, 0, 1, 0);
+
     background(100);
 
     noStroke();
     fill(50);
     push();
-    translate(x, y);
+    translate(x, y, z);
     //rotateY(1.25);
     //rotateX(-0.9);
     texture(img);
