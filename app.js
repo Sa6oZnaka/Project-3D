@@ -13,11 +13,10 @@ var sizeZ = 300;
 
 let img;
 function preload(){
-    img = loadImage('assets/cube.png');
+    //img = loadImage('assets/cube.png');
 
     car = loadModel('assets/Porsche_911_GT2/Porsche_911_GT2.obj');
     //car = loadModel('assets/huracan in 2.8.obj');
-
     //car = loadModel('assets/BMW X5 4.obj')
 
 }
@@ -27,70 +26,56 @@ function setup() {
     createCanvas(window.innerWidth, window.innerHeight, WEBGL);
 }
 
+var offsetX;
+var offsetY;
+
 function Input(){
     if (keyIsDown(LEFT_ARROW)) {
-        angle -= PI / 18;
+        angle += (speed / 2.5) / 180 * PI;
+        speed *= 0.99;
     }
     if (keyIsDown(RIGHT_ARROW)) {
-        angle += PI / 18;
+        angle -= (speed / 2.5) / 180 * PI;
+        speed *= 0.99;
     }
     if (keyIsDown(UP_ARROW)) {
-        speed -= 0.5;
+        speed -= 0.1;
     }
     if (keyIsDown(DOWN_ARROW)) {
-        speed += 0.5;
+        speed += 0.05;
     }
+
+    var lastOffsetX = offsetX;
+    var lastOffsetY = offsetY;
+    offsetX -= Math.cos(angle) * speed * 2;
+    offsetY -= Math.sin(angle) * speed * 2;
+    
+    myLastX = z;
+    myLastY = x;
+    z += Math.cos(angle) * speed *2;
+    x -= Math.sin(angle) * speed *2;
+
+    speed*=0.987;
+
 }
 
 function draw() {
 
-    if(angle != 0){
-        if(angle > 0){
-            x -= speed * angle;
-            angle -= (speed * angle)/10;
-        }else{
-            x += speed * angle;
-            angle += (speed * angle)/10;
-        }
-    }
-
-    z += speed;
-    speed = speed / 1.02;
-
     let camY = 30; 
-    let camX = x;//map(mouseX, 0, width, -200, 0);
+    let camX = x;
     let camZ = z;
 
-    //camera(camX, camY, (height/2) / tan(PI/6), x, y, z, 0, 1, 0);
     camera(camX, camY, 400 + z, x, y, z, 0, 1, 0);
-
-
 
     background(100);
 
-    //noStroke();
-    //fill(50);
     push();
     translate(x, y, z);
     rotateZ(PI);
     rotateY(angle);
-    //texture(img);
-
     scale(50);
-    //model(car);
-    //box(sizeX, sizeY, sizeZ);
-        //pop();
-
-    //normalMaterial(255);
-
-    //background(200);
-      //rotateX(frameCount * 0.01);
-      //rotateY(frameCount * 0.01);
+    fill(0, 102, 153);
     model(car);
-    //normalMaterial(255);
-
-
-
     pop();
 
 
