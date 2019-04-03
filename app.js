@@ -11,13 +11,13 @@ var sizeX = 100;
 var sizeY = 60;
 var sizeZ = 300;
 
-let img;
+let img,
+    car;
 function preload(){
     //img = loadImage('assets/cube.png');
 
     car = loadModel('assets/Porsche_911_GT2/Porsche_911_GT2.obj');
-    //car = loadModel('assets/huracan in 2.8.obj');
-    //car = loadModel('assets/BMW X5 4.obj')
+    img = loadImage('assets/Porsche_911_GT2/skin00/0000-a.BMP');
 
 }
 
@@ -31,15 +31,15 @@ var offsetY;
 
 function Input(){
     if (keyIsDown(LEFT_ARROW)) {
-        angle += (speed / 2.5) / 180 * PI;
+        angle += (speed / 3.5) / 180 * PI;
         speed *= 0.99;
     }
     if (keyIsDown(RIGHT_ARROW)) {
-        angle -= (speed / 2.5) / 180 * PI;
+        angle -= (speed / 3.5) / 180 * PI;
         speed *= 0.99;
     }
     if (keyIsDown(UP_ARROW)) {
-        speed -= 0.1;
+        speed -= 0.2;
     }
     if (keyIsDown(DOWN_ARROW)) {
         speed += 0.05;
@@ -75,16 +75,19 @@ function draw() {
     rotateY(angle);
     scale(50);
     fill(0, 102, 153);
+    texture(img);
     model(car);
     pop();
 
 
     noFill();
     stroke(255);
-    push();
-    translate(500, height * 0.35, -200);
-    sphere(300);
-    pop();
+    for(var i = 0;i < 100; i ++){
+        push();
+        translate(500, height * 0.35, i * -1500);
+        sphere(300);
+        pop();
+    }
 
 
     Input();
