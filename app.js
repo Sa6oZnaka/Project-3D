@@ -1,9 +1,9 @@
 
-var x = -275,
+var x = -505,
     y =  120,
     z =   10,
 
-    angle = 0, 
+    angle = 10, 
     speed = 0;
 
 var sizeX = 100;
@@ -14,33 +14,38 @@ let img,
     car;
 
 
-class SmallHosue{
+class Objects{
 
-    constructor(poX, posY){
+    constructor(x, y, z, sizeX, sizeY, sizeZ, angle, model, texture, scale){
         this.x = x;
         this.y = y;
-    }
+        this.z = z;
 
-    get_x(){
-        return this.x;
-    }
-    get_y(){
-        return this.y;
-    }
-    get_size_x(){
-        return this.x;
-    }
-    get_size_y(){
-        return this.y;
+        this.sizeX = sizeX;
+        this.sizeY = sizeY;
+        this.sizeZ = sizeZ;
+
+        this.angle = angle;
+        this.model = model;
+        this.texture = texture;
+        this.scale = scale;
     }
 
 };
 
-function collision(){
+/*
+function collision(Objects o1, Objects o2){
 
-    //TODO
+    if(o1.x > o2.x && o1.x + o1.sizeX < o2.x + o2.sizeX &&
+       o1.y > o2.y && o1.y + o1.sizeY < o2.y + o2.sizeY && 
+       o1.z > o2.z && o1.z + o1.sizeZ < o2.z + o2.sizeZ){
 
-}
+        return 1;
+    }
+    return 0;
+
+}*/
+
 
 function preload(){
     //img = loadImage('assets/cube.png');
@@ -88,7 +93,16 @@ function Input(){
 
     speed*=0.987;
 
-}
+};
+
+var ObjArr=[];
+var ObjectCount = 0;
+
+// Create test object
+var temp = new Objects(x, y, z, 140, 100, 350, angle, car, img);
+ObjArr[ObjArr.length] = temp;
+ObjectCount++;
+
 
 function draw() {
 
@@ -160,6 +174,28 @@ function draw() {
         sphere(300);
         pop();
     }
+
+    for(var i = 0;i < ObjectCount;i ++){
+        push();
+        translate(ObjArr[i].x, ObjArr[i].y, ObjArr[i].z);
+        rotateZ(PI);
+        rotateY(ObjArr[i].angle);
+        //scale(ObjArr[i].scale); 
+        scale(80);
+        fill(255, 255, 0);
+        //texture(ObjArr[i].texture);
+        //model(ObjArr[i].model);
+        model(car);
+        pop();
+        // HIT BOX
+        push();
+        translate(ObjArr[i].x, ObjArr[i].y, ObjArr[i].z);
+        rotateY(-ObjArr[i].angle);
+        box(ObjArr[i].sizeX, ObjArr[i].sizeY, ObjArr[i].sizeZ);
+        pop();
+
+    }
+
 
 
     Input();
