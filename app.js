@@ -6,9 +6,12 @@ var x = -505,
     angle = 10, 
     speed = 0;
 
-var sizeX = 100;
-var sizeY = 60;
-var sizeZ = 300;
+var offsetX;
+var offsetY;
+
+var sizeX = 100,
+    sizeY =  60,
+    sizeZ = 300;
 
 let img,
     car;
@@ -16,7 +19,7 @@ let img,
 
 class Objects{
 
-    constructor(x, y, z, sizeX, sizeY, sizeZ, angle, model, texture, scale){
+    constructor(x, y, z, sizeX, sizeY, sizeZ, angle, type, id){
         this.x = x;
         this.y = y;
         this.z = z;
@@ -26,15 +29,14 @@ class Objects{
         this.sizeZ = sizeZ;
 
         this.angle = angle;
-        this.model = model;
-        this.texture = texture;
-        this.scale = scale;
+        this.type  = type;
+        this.id    = id;
     }
 
 };
 
-/*
-function collision(Objects o1, Objects o2){
+
+function collision(o1, o2){
 
     if(o1.x > o2.x && o1.x + o1.sizeX < o2.x + o2.sizeX &&
        o1.y > o2.y && o1.y + o1.sizeY < o2.y + o2.sizeY && 
@@ -44,26 +46,21 @@ function collision(Objects o1, Objects o2){
     }
     return 0;
 
-}*/
+}
 
 
 function preload(){
-    //img = loadImage('assets/cube.png');
-
+    // textures
     car = loadModel('assets/Porsche_911_GT2/Porsche_911_GT2.obj');
-    img = loadImage('assets/Porsche_911_GT2/skin00/0000-a2.png');
 
+    // models
     house = loadModel('assets/house.obj');
-
+    img = loadImage('assets/Porsche_911_GT2/skin00/0000-a2.png');
 }
 
 function setup() {
-
     createCanvas(window.innerWidth, window.innerHeight, WEBGL);
 }
-
-var offsetX;
-var offsetY;
 
 function Input(){
     if (keyIsDown(LEFT_ARROW)) {
@@ -99,10 +96,22 @@ var ObjArr=[];
 var ObjectCount = 0;
 
 // Create test object
-var temp = new Objects(x, y, z, 140, 100, 350, angle, car, img);
+var temp = new Objects(x, y, z, 140, 100, 350, angle, "dynamic", "Porsche_911_GT2");
 ObjArr[ObjArr.length] = temp;
 ObjectCount++;
 
+
+var SmallHouse=[];
+var SmallHouseCount = 0;
+function CreateSmallHouse(x, y, z, angle){
+    var temp = new Objects(x, y, z, 660, 700, 840, angle, "Static", "SmallHosue");
+    SmallHouse[SmallHouseCount] = temp;
+    SmallHouseCount++;
+}
+
+CreateSmallHouse(1400, 150, -100, 0);
+CreateSmallHouse(2200, 150, -100, 0);
+CreateSmallHouse(100, 150, 700, 0);
 
 function draw() {
 
@@ -149,31 +158,26 @@ function draw() {
     pop();
 
 
-    push();
-    translate(0, 150, -100);
-    rotateZ(PI);
-    scale(2);
-    fill(0, 102, 153);
-    //texture(img);
-    model(house);
-    pop();
-    // HITBOX
-    push();
-    //fill(0, 255, 255);
-    translate(0 + 40, 150, -100 + 25);
-    box(660, 700, 840);
-    pop();
-
+    for(var i = 0; i < SmallHouseCount; i++){
+        push();
+        translate(SmallHouse[i].x, SmallHouse[i].y, SmallHouse[i].z);
+        rotateZ(PI);
+        scale(2);
+        fill(0, 102, 153);
+        //texture(img);
+        model(house);
+        pop();
+        // HITBOX
+        push();
+        //fill(0, 255, 255);
+        translate(SmallHouse[i].x + 40, SmallHouse[i].y, SmallHouse[i].z + 25);
+        box(SmallHouse[i].sizeX, SmallHouse[i].sizeY, SmallHouse[i].sizeZ);
+        pop();
+    }
 
 
     noFill();
     stroke(255);
-    for(var i = 0;i < 100; i ++){
-        push();
-        translate(500, height * 0.35, i * -1500);
-        sphere(300);
-        pop();
-    }
 
     for(var i = 0;i < ObjectCount;i ++){
         push();
