@@ -1,22 +1,3 @@
-
-var x = -505,
-    y =  120,
-    z =   10,
-
-    angle = 10, 
-    speed = 0;
-
-var offsetX;
-var offsetY;
-
-var sizeX = 100,
-    sizeY =  60,
-    sizeZ = 300;
-
-let img,
-    car;
-
-
 class Objects{
 
     constructor(x, y, z, sizeX, sizeY, sizeZ, angle, type, id){
@@ -35,6 +16,40 @@ class Objects{
 
 };
 
+class Movable extends Objects{
+
+    constructor(x, y, z, sizeX, sizeY, sizeZ, angle, type, id, speed){
+        super(x, y, z, sizeX, sizeY, sizeZ, angle, type, id);
+
+        this.speed = 0;
+    }
+
+    Move(direction){
+        
+        if(direction == "LEFT"){
+            this.angle += (this.speed / 3.5) / 180 * PI;
+            this.speed *= 0.99;
+        }
+        if(direction == "RIGHT"){
+            this.angle -= (this.speed / 3.5) / 180 * PI;
+            this.speed *= 0.99;   
+        }
+        if(direction == "UP"){
+            this.speed -= 0.06;
+        }
+        if(direction == "DOWN"){
+            this.speed += 0.04;   
+        }
+    }
+
+    Update(){
+        this.z += Math.cos(this.angle) * this.speed * 2;
+        this.x -= Math.sin(this.angle) * this.speed * 2;
+
+        this.speed *= 0.993;
+    }
+
+};
 
 function collision(o1, o2){
 
@@ -47,7 +62,6 @@ function collision(o1, o2){
     return 0;
 
 }
-
 
 function preload(){
     // textures
@@ -62,43 +76,30 @@ function setup() {
     createCanvas(window.innerWidth, window.innerHeight, WEBGL);
 }
 
-function Input(){
-    if (keyIsDown(LEFT_ARROW)) {
-        angle += (speed / 3.5) / 180 * PI;
-        speed *= 0.99;
-    }
-    if (keyIsDown(RIGHT_ARROW)) {
-        angle -= (speed / 3.5) / 180 * PI;
-        speed *= 0.99;
-    }
-    if (keyIsDown(UP_ARROW)) {
-        speed -= 0.2;
-    }
-    if (keyIsDown(DOWN_ARROW)) {
-        speed += 0.05;
-    }
-
-    var lastOffsetX = offsetX;
-    var lastOffsetY = offsetY;
-    offsetX -= Math.cos(angle) * speed * 2;
-    offsetY -= Math.sin(angle) * speed * 2;
-    
-    myLastX = z;
-    myLastY = x;
-    z += Math.cos(angle) * speed * 2;
-    x -= Math.sin(angle) * speed * 2;
-
-    speed*=0.987;
-
-};
-
 var ObjArr=[];
 var ObjectCount = 0;
 
 // Create test object
-var temp = new Objects(x, y, z, 140, 100, 350, angle, "dynamic", "Porsche_911_GT2");
+var temp = new Movable(-505, 120, 10, 140, 100, 350, 30, "dynamic", "Porsche_911_GT2", 2);
 ObjArr[ObjArr.length] = temp;
 ObjectCount++;
+
+
+function Input(){
+    if (keyIsDown(LEFT_ARROW)) {
+        ObjArr[0].Move("LEFT");
+    }
+    if (keyIsDown(RIGHT_ARROW)) {
+        ObjArr[0].Move("RIGHT");
+    }
+    if (keyIsDown(UP_ARROW)) {
+        ObjArr[0].Move("UP");
+    }
+    if (keyIsDown(DOWN_ARROW)) {
+        ObjArr[0].Move("DOWN");
+    }
+};
+
 
 
 var SmallHouse=[];
@@ -113,47 +114,21 @@ CreateSmallHouse(1400, 150, -100, 0);
 CreateSmallHouse(2200, 150, -100, 0);
 CreateSmallHouse(100, 150, 700, 0);
 
+
 function draw() {
 
-    let camY = 30; 
-    let camX = x;
-    let camZ = z;
+    // UPDATE DYNAMIC OBJECTS
+    ObjArr[0].Update();
 
-    camera(camX, camY, 400 + z, x+ angle, y, z, 0, 1, 0);
+
+    camera(ObjArr[0].x, ObjArr[0].y - 100, 400 + ObjArr[0].z, ObjArr[0].x + ObjArr[0].angle, ObjArr[0].y, ObjArr[0].z, 0, 1, 0);
 
     background(100);
 
 
     push();
-    translate(x, y, z);
-    rotateZ(PI);
-    rotateY(angle);
-    scale(80);
-    fill(0, 102, 153);
-    texture(img);
-    model(car);
-    pop();
-    // HIT BOX
-    push();
-    translate(x, y, z);
-    rotateY(-angle);
-    box(140, 100, 350);
-    pop();
-
-
-    push();
     fill(0, 255, 0);
     translate(-275, 175);
-    //texture(grasstexture);
-    box(100000, 1, 100000);
-    pop();
-
-
-    push();
-    fill(0, 255, 0);
-    translate(-275, 175);
-    //rotateY(1.25);
-    //rotateX(-0.9);
     box(100000, 1, 100000);
     pop();
 
