@@ -51,17 +51,15 @@ class Movable extends Objects{
 
 };
 
-function collision(o1, o2, scale1, scale2){
+var a = 50;
+function collision(o1, o2){
 
-    scale1 = 1;
-    scale2 = 1;
+    //console.log(o1.x , ">" , o2.x , " && " , o1.sizeX , " + " , o1.sizeX , " < " , o2.x , "+ " , o2.sizeX);
 
-    if(o1.x * scale1 > o2.x * scale2 &&
-       o1.x * scale1 + o1.sizeX * scale1 < o2.x * scale2 + o2.sizeX * scale2 &&
-       o1.y * scale1 > o2.y * scale2 &&
-       o1.y * scale1 + o1.sizeY * scale1 < o2.y * scale2 + o2.sizeY * scale2 && 
-       o1.z * scale1 > o2.z * scale2 && 
-       o1.z * scale1 + o1.sizeZ * scale1 < o2.z * scale2 + o2.sizeZ * scale2){
+    if(o1.x > o2.x - o2.sizeX - 300 && o1.x < o2.x + o2.sizeX + 300 &&
+       o1.z > o2.z - o2.sizeZ - 300 && o1.z < o2.z + o2.sizeZ + 300){
+        ObjArr[0].speed = -ObjArr[0].speed;
+
 
         return 1;
     }
@@ -118,7 +116,8 @@ function draw() {
     
     // TEST //
     
-    if( collision(ObjArr[0], ObjArr[1]) , 80, 2) console.log("COLLISION!");
+   collision(ObjArr[3], ObjArr[0]);
+    //if( collision(ObjArr[0], ObjArr[3] ,1, 1)) console.log("COLLISION!");
     
     //////////
     
@@ -145,14 +144,14 @@ function draw() {
     
         if(ObjArr[i].type == "dynamic"){
             if(ObjArr[i].id == "Porsche_911_GT2"){
-                push();
-                translate(ObjArr[i].x, ObjArr[i].y, ObjArr[i].z);
-                rotateZ(PI);
-                rotateY(ObjArr[i].angle); 
-                scale(80);
-                fill(255, 255, 0);
-                model(car);
-                pop();
+                //push();
+                //translate(ObjArr[i].x, ObjArr[i].y, ObjArr[i].z);
+                //rotateZ(PI);
+                //rotateY(ObjArr[i].angle); 
+                //scale(80);
+                //fill(255, 255, 0);
+                //model(car);
+                //pop();
                 // HIT BOX
                 push();
                 translate(ObjArr[i].x, ObjArr[i].y, ObjArr[i].z);
@@ -162,14 +161,14 @@ function draw() {
             }    
         }else{
             if(ObjArr[i].id == "SmallHouse"){        
-                push();
-                translate(ObjArr[i].x - 40, ObjArr[i].y, ObjArr[i].z + 25);
-                rotateZ(PI);
-                scale(2);
-                fill(0, 102, 153);
+                //push();
+                //translate(ObjArr[i].x - 40, ObjArr[i].y, ObjArr[i].z + 25);
+                //rotateZ(PI);
+                //scale(2);
+                //fill(0, 102, 153);
                 //texture(img);
-                model(house);
-                pop();
+                //model(house);
+                //pop();
                 // HITBOX
                 push();
                 //fill(0, 255, 255);
