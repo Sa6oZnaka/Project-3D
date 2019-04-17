@@ -51,11 +51,17 @@ class Movable extends Objects{
 
 };
 
-function collision(o1, o2){
+function collision(o1, o2, scale1, scale2){
 
-    if(o1.x > o2.x && o1.x + o1.sizeX < o2.x + o2.sizeX &&
-       o1.y > o2.y && o1.y + o1.sizeY < o2.y + o2.sizeY && 
-       o1.z > o2.z && o1.z + o1.sizeZ < o2.z + o2.sizeZ){
+    scale1 = 1;
+    scale2 = 1;
+
+    if(o1.x * scale1 > o2.x * scale2 &&
+       o1.x * scale1 + o1.sizeX * scale1 < o2.x * scale2 + o2.sizeX * scale2 &&
+       o1.y * scale1 > o2.y * scale2 &&
+       o1.y * scale1 + o1.sizeY * scale1 < o2.y * scale2 + o2.sizeY * scale2 && 
+       o1.z * scale1 > o2.z * scale2 && 
+       o1.z * scale1 + o1.sizeZ * scale1 < o2.z * scale2 + o2.sizeZ * scale2){
 
         return 1;
     }
@@ -65,11 +71,11 @@ function collision(o1, o2){
 
 function preload(){
     // textures
-    car = loadModel('assets/Porsche_911_GT2/Porsche_911_GT2.obj');
+    img = loadImage('assets/Porsche_911_GT2/skin00/0000-a2.png');
 
     // models
     house = loadModel('assets/house.obj');
-    img = loadImage('assets/Porsche_911_GT2/skin00/0000-a2.png');
+    car = loadModel('assets/Porsche_911_GT2/Porsche_911_GT2.obj');
 }
 
 function setup() {
@@ -78,12 +84,6 @@ function setup() {
 
 var ObjArr=[];
 var ObjectCount = 0;
-
-// Create test object
-var temp = new Movable(-505, 120, 10, 140, 100, 350, 30, "dynamic", "Porsche_911_GT2", 2);
-ObjArr[ObjArr.length] = temp;
-ObjectCount++;
-
 
 function Input(){
     if (keyIsDown(LEFT_ARROW)) {
@@ -100,31 +100,37 @@ function Input(){
     }
 };
 
-
-
-var SmallHouse=[];
-var SmallHouseCount = 0;
 function CreateSmallHouse(x, y, z, angle){
-    var temp = new Objects(x, y, z, 660, 700, 840, angle, "Static", "SmallHosue");
-    SmallHouse[SmallHouseCount] = temp;
-    SmallHouseCount++;
+    var temp = new Objects(x, y, z, 660, 700, 840, angle, "Static", "SmallHouse");
+    ObjArr.push(temp);
 }
 
+// Create dynamic object
+var temp = new Movable(-505, 120, 10, 140, 100, 350, 30, "dynamic", "Porsche_911_GT2", 2);
+ObjArr.push(temp);
+
+// static objects
 CreateSmallHouse(1400, 150, -100, 0);
 CreateSmallHouse(2200, 150, -100, 0);
 CreateSmallHouse(100, 150, 700, 0);
 
-
 function draw() {
-
-    // UPDATE DYNAMIC OBJECTS
-    ObjArr[0].Update();
-
-
+    
+    // TEST //
+    
+    if( collision(ObjArr[0], ObjArr[1]) , 80, 2) console.log("COLLISION!");
+    
+    //////////
+    
+    for(var i = 0; i < ObjArr.length;i ++){
+        if(ObjArr[i].type == "dynamic"){
+            ObjArr[i].Update();
+        }
+    }    
+        
     camera(ObjArr[0].x, ObjArr[0].y - 100, 400 + ObjArr[0].z, ObjArr[0].x + ObjArr[0].angle, ObjArr[0].y, ObjArr[0].z, 0, 1, 0);
 
     background(100);
-
 
     push();
     fill(0, 255, 0);
@@ -132,50 +138,47 @@ function draw() {
     box(100000, 1, 100000);
     pop();
 
-
-    for(var i = 0; i < SmallHouseCount; i++){
-        push();
-        translate(SmallHouse[i].x, SmallHouse[i].y, SmallHouse[i].z);
-        rotateZ(PI);
-        scale(2);
-        fill(0, 102, 153);
-        //texture(img);
-        model(house);
-        pop();
-        // HITBOX
-        push();
-        //fill(0, 255, 255);
-        translate(SmallHouse[i].x + 40, SmallHouse[i].y, SmallHouse[i].z + 25);
-        box(SmallHouse[i].sizeX, SmallHouse[i].sizeY, SmallHouse[i].sizeZ);
-        pop();
-    }
-
-
     noFill();
     stroke(255);
 
-    for(var i = 0;i < ObjectCount;i ++){
-        push();
-        translate(ObjArr[i].x, ObjArr[i].y, ObjArr[i].z);
-        rotateZ(PI);
-        rotateY(ObjArr[i].angle);
-        //scale(ObjArr[i].scale); 
-        scale(80);
-        fill(255, 255, 0);
-        //texture(ObjArr[i].texture);
-        //model(ObjArr[i].model);
-        model(car);
-        pop();
-        // HIT BOX
-        push();
-        translate(ObjArr[i].x, ObjArr[i].y, ObjArr[i].z);
-        rotateY(-ObjArr[i].angle);
-        box(ObjArr[i].sizeX, ObjArr[i].sizeY, ObjArr[i].sizeZ);
-        pop();
-
+    for(var i = 0;i < ObjArr.length;i ++){
+    
+        if(ObjArr[i].type == "dynamic"){
+            if(ObjArr[i].id == "Porsche_911_GT2"){
+                push();
+                translate(ObjArr[i].x, ObjArr[i].y, ObjArr[i].z);
+                rotateZ(PI);
+                rotateY(ObjArr[i].angle); 
+                scale(80);
+                fill(255, 255, 0);
+                model(car);
+                pop();
+                // HIT BOX
+                push();
+                translate(ObjArr[i].x, ObjArr[i].y, ObjArr[i].z);
+                rotateY(-ObjArr[i].angle);
+                box(ObjArr[i].sizeX, ObjArr[i].sizeY, ObjArr[i].sizeZ);
+                pop();
+            }    
+        }else{
+            if(ObjArr[i].id == "SmallHouse"){        
+                push();
+                translate(ObjArr[i].x - 40, ObjArr[i].y, ObjArr[i].z + 25);
+                rotateZ(PI);
+                scale(2);
+                fill(0, 102, 153);
+                //texture(img);
+                model(house);
+                pop();
+                // HITBOX
+                push();
+                //fill(0, 255, 255);
+                translate(ObjArr[i].x, ObjArr[i].y, ObjArr[i].z);
+                box(ObjArr[i].sizeX, ObjArr[i].sizeY, ObjArr[i].sizeZ);
+                pop();        
+            }    
+        }
     }
-
-
 
     Input();
 }
