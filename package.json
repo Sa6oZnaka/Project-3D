@@ -1,0 +1,8 @@
+{
+  "version": "1.0.0",
+  "description": "",
+  "author": "Sa6oZnaka",
+  "dependencies": {
+    "express": "^4.15.3"
+  }
+}
