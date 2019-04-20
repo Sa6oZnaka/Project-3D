@@ -54,8 +54,6 @@ class Movable extends Objects{
 var a = 50;
 function collision(o1, o2){
 
-    //console.log(o1.x , ">" , o2.x , " && " , o1.sizeX , " + " , o1.sizeX , " < " , o2.x , "+ " , o2.sizeX);
-
     if(o1.x > o2.x - o2.sizeX - 350 && o1.x < o2.x + o2.sizeX + 350 &&
        o1.z > o2.z - o2.sizeZ - 330 && o1.z < o2.z + o2.sizeZ + 330){
         ObjArr[0].speed = -ObjArr[0].speed;
@@ -114,6 +112,9 @@ CreateSmallHouse(100, 150, 700, 0);
 
 function draw() {
 
+    directionalLight(255,255, 255,  0, 1, 0);
+    directionalLight(255,255, 255,  1, 0, 0);
+
     // Collision //
     for(var i = 0; i < ObjArr.length; i ++){
         if(ObjArr[i].type == "dynamic"){
@@ -136,9 +137,8 @@ function draw() {
     background(100);
 
     push();
-    //fill(0, 255, 0);
-    normalMaterial();
-    //ambientMaterial(250);
+    //fill(0, 100, 0);
+    ambientMaterial(0, 255, 0);
     translate(-275, 175);
     box(100000, 1, 100000);
     pop();
@@ -155,7 +155,8 @@ function draw() {
                 rotateZ(PI);
                 rotateY(ObjArr[i].angle); 
                 scale(80);
-                normalMaterial();
+                noStroke();
+                specularMaterial(255, 255, 0);
                 model(car);
                 pop();
 
@@ -171,13 +172,14 @@ function draw() {
         }else{
             if(ObjArr[i].id == "SmallHouse"){        
                 push();
+                noStroke();
                 translate(ObjArr[i].x - 40, ObjArr[i].y, ObjArr[i].z + 25);
                 rotateZ(PI);
                 scale(2);
-                normalMaterial();
+                ambientMaterial(255, 0, 0);
                 model(house);
                 pop();
-                
+
                 // HITBOX
                 push();
                 noFill();
@@ -187,6 +189,6 @@ function draw() {
             }    
         }
     }
-
+    
     Input();
 }
