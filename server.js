@@ -1,53 +1,70 @@
-var express = require('express');
-var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+let express = require('express');
+let app = express();
+let http = require('http').Server(app);
+let io = require('socket.io')(http);
 
 app.use(express.static("public"));
 
-var id = 0;
-var list = [];
-var freeSpots = [];//for big number of users better to use a heap
-var data = {};
+let id = 0;
+let list = [];
+let freeSpots = [];//for big number of users better to use a heap
+let data = {};
 data.users = [];
-io.on("connection", function(socket){
-  var cid;
-  if (freeSpots.length>0){
-    minind = 0;
-    for (var i=1; i<freeSpots.length; ++i){
-      if (freeSpots[i]<freeSpots[minind]){
-        minind = i;
-      }
-    }
-    cid = freeSpots[minind];
-    freeSpots.splice(minind, 1);
-  }
-  else{
-    cid = id++;
-  }
-  console.log("connection from id: " + socket.id);
 
-  list[cid] = 1;
-  data.users[cid] = {};
-  socket.emit("id", cid, data, list);
-  io.emit("listCon", cid);
 
-  socket.on("disconnect", function(){
-    list[cid] = 0;
-    freeSpots.push(cid);
-    io.emit("listDiscon", cid);
-  });
+let vehs = new Map();
 
-  socket.on("update", function(variable, value){
-    data[variable] = value;
-    socket.broadcast.emit("update", variable, value);
-  });
-  socket.on("updateForUser", function(user, variable, value){
-    data.users[user][variable] = value;
-    socket.broadcast.emit("updateForUser", user, variable, value);
-  });
+io.on('connection', function (socket) {
+
+    console.log(`ID ${socket.id} connected!`);
+    socket.emit('init', {
+        'vehs': vehs,
+    });
+
+    socket.on('spawn', function (username) {
+        let veh = {
+            'x': -600 + Math.random() * 300,
+            'y': 120,
+            'z': Math.random() * 100,
+            'sizeX': 200,
+            'sizeY': 100,
+            'sizeZ': 300,
+            'angle': 30,
+            'type': "dynamic",
+            'id': socket.id
+        };
+
+        vehs.set(veh.id, veh);
+        io.emit('spawn', veh);
+    });
+
+    socket.on('update', function (data) {
+        vehs.set(data.id, {
+            'x': data.x,
+            'y': data.y,
+            'z': data.z,
+            'sizeX' : data.sizeX,
+            'sizeY' : data.sizeY,
+            'sizeZ' : data.sizeZ,
+            'angle': data.angle,
+            'type' : data.type,
+            'id' : socket.id
+        });
+
+        socket.broadcast.emit('update', data);
+    });
+
+    socket.on('disconnect', function () {
+        vehs.delete(socket.id);
+
+        io.emit('delete', {
+            'id': socket.id
+        });
+        console.log(`ID ${socket.id} disconnected!`);
+    });
 });
 
-http.listen(3000, function(){
-  console.log("server started on port 3000");
+
+http.listen(3000, function() {
+    console.log("server started on port 3000");
 });

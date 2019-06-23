@@ -14,4 +14,20 @@ class Building{
         this.id    = id;
     }
 
-};
+    getX(){
+        return this.x;
+    }
+
+    getY(){
+        return this.y;
+    }
+
+    getZ(){
+        return this.z;
+    }
+
+    getAngle(){
+        return this.angle;
+    }
+
+}

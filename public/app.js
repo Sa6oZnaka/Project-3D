@@ -1,3 +1,7 @@
+var socket = io();
+
+var vehs = new Map();
+
 function collision(o1, o2){
 
     if(o1.x > o2.x - o2.sizeX - 350 && o1.x < o2.x + o2.sizeX + 350 &&
@@ -20,23 +24,26 @@ function preload(){
 
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight, WEBGL);
+
+    socket.emit('spawn', "User");
 }
 
 let ObjArr = [];
 
-function Input(){
+function Input(obj){
     if (keyIsDown(LEFT_ARROW)) {
-        ObjArr[0].Move("LEFT");
+        obj.Move("LEFT");
     }
     if (keyIsDown(RIGHT_ARROW)) {
-        ObjArr[0].Move("RIGHT");
+        obj.Move("RIGHT");
     }
     if (keyIsDown(UP_ARROW)) {
-        ObjArr[0].Move("UP");
+        obj.Move("UP");
     }
     if (keyIsDown(DOWN_ARROW)) {
-        ObjArr[0].Move("DOWN");
+        obj.Move("DOWN");
     }
+    socket.emit('update', obj);
 };
 
 function CreateSmallHouse(x, y, z, angle){
@@ -44,16 +51,20 @@ function CreateSmallHouse(x, y, z, angle){
     ObjArr.push(temp);
 }
 
-// Create dynamic object
-let temp = new Movable(-505, 120, 10, 140, 100, 350, 30, "dynamic", "Porsche_911_GT2", 2);
-ObjArr.push(temp);
-
 // static objects
 CreateSmallHouse(1400, 150, -100, 0);
 CreateSmallHouse(2200, 150, -100, 0);
-CreateSmallHouse(100, 150, 700, 0);
+//CreateSmallHouse(100, 150, 700, 0);
 
 function draw() {
+
+    /// show something else while the socket is being initialized
+    if (!socket.connected || !vehs.has(socket.id)) {
+        showLoadingScreen('Connecting...');
+        return;
+    }
+
+    let myVeh = vehs.get(socket.id);
 
     directionalLight(255,255, 255,  0, 1, 0);
     directionalLight(255,255, 255,  1, 0, 0);
@@ -69,13 +80,7 @@ function draw() {
         }
     }
 
-    for(let i = 0; i < ObjArr.length;i ++){
-        if(ObjArr[i].type === "dynamic"){
-            ObjArr[i].Update();
-        }
-    }
-
-    camera(ObjArr[0].x, ObjArr[0].y - 100, 400 + ObjArr[0].z, ObjArr[0].x + ObjArr[0].angle, ObjArr[0].y, ObjArr[0].z, 0, 1, 0);
+    camera(myVeh.x, myVeh.y - 100, 400 + myVeh.z, myVeh.x + myVeh.angle, myVeh.y, myVeh.z, 0, 1, 0);
 
     background(100);
 
@@ -133,5 +138,24 @@ function draw() {
         }
     }
 
-    Input();
+    vehs.forEach(function (veh) {
+        push();
+        translate(veh.getX(), veh.getY(), veh.getZ());
+        rotateZ(PI);
+        rotateY(veh.getAngle());
+        scale(80);
+        noStroke();
+        specularMaterial(255, 255, 0);
+        model(car);
+        pop();
+
+        veh.Update();
+    });
+
+
+    Input(myVeh);
+}
+
+function showLoadingScreen(message) {
+    console.log("Loading...");
 }
