@@ -1,34 +1,32 @@
 var socket = io();
 
 var vehs = new Map();
-
-function collision(o1, o2){
-
-    if(o1.x > o2.x - o2.sizeX - 350 && o1.x < o2.x + o2.sizeX + 350 &&
-        o1.z > o2.z - o2.sizeZ - 330 && o1.z < o2.z + o2.sizeZ + 330){
-        ObjArr[0].speed = -ObjArr[0].speed;
-
-        return 1;
-    }
-    return 0;
-}
+let ObjArr = [];
 
 function preload(){
     // textures
-    img = loadImage('assets/Porsche_911_GT2/skin00/0000-a2.png');
+
+    porscheColors = {
+        red : loadImage('assets/Porsche_911_GT2/texture/red.png'),
+        green : loadImage('assets/Porsche_911_GT2/texture/green.png'),
+        blue : loadImage('assets/Porsche_911_GT2/texture/blue.png'),
+        white : loadImage('assets/Porsche_911_GT2/texture/white.png'),
+        black : loadImage('assets/Porsche_911_GT2/texture/black.png'),
+        yellow : loadImage('assets/Porsche_911_GT2/texture/yellow.png'),
+        orange : loadImage('assets/Porsche_911_GT2/texture/orange.png')
+    };
 
     // models
-    house = loadModel('assets/house.obj');
+    house = loadModel('assets/Buildings/house.obj');
     car = loadModel('assets/Porsche_911_GT2/Porsche_911_GT2.obj');
+
 }
 
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight, WEBGL);
 
-    socket.emit('spawn', "User");
+    socket.emit('spawn', "Porsche_911");
 }
-
-let ObjArr = [];
 
 function Input(obj){
     if (keyIsDown(LEFT_ARROW)) {
@@ -69,17 +67,6 @@ function draw() {
     directionalLight(255,255, 255,  0, 1, 0);
     directionalLight(255,255, 255,  1, 0, 0);
 
-    // Collision //
-    for(let i = 0; i < ObjArr.length; i ++){
-        if(ObjArr[i].type === "dynamic"){
-            for(let j = 0; j < ObjArr.length; j ++){
-                if(i !== j){
-                    collision(ObjArr[j], ObjArr[i]);
-                }
-            }
-        }
-    }
-
     camera(myVeh.x, myVeh.y - 100, 400 + myVeh.z, myVeh.x + myVeh.angle, myVeh.y, myVeh.z, 0, 1, 0);
 
     background(100);
@@ -95,57 +82,43 @@ function draw() {
     stroke(255);
 
     for(let i = 0;i < ObjArr.length;i ++){
+        if(ObjArr[i].id === "SmallHouse"){
+            push();
+            noStroke();
+            translate(ObjArr[i].x - 40, ObjArr[i].y, ObjArr[i].z + 25);
+            rotateZ(PI);
+            scale(2);
+            ambientMaterial(255, 0, 0);
+            model(house);
+            pop();
 
-        if(ObjArr[i].type === "dynamic"){
-            if(ObjArr[i].id === "Porsche_911_GT2"){
-                push();
-                translate(ObjArr[i].x, ObjArr[i].y, ObjArr[i].z);
-                rotateZ(PI);
-                rotateY(ObjArr[i].angle);
-                scale(80);
-                noStroke();
-                specularMaterial(255, 255, 0);
-                model(car);
-                pop();
-
-                // HIT BOX
-                push();
-                noFill();
-                //normalMaterial();
-                translate(ObjArr[i].x, ObjArr[i].y, ObjArr[i].z);
-                rotateY(-ObjArr[i].angle);
-                box(ObjArr[i].sizeX, ObjArr[i].sizeY, ObjArr[i].sizeZ);
-                pop();
-            }
-        }else{
-            if(ObjArr[i].id === "SmallHouse"){
-                push();
-                noStroke();
-                translate(ObjArr[i].x - 40, ObjArr[i].y, ObjArr[i].z + 25);
-                rotateZ(PI);
-                scale(2);
-                ambientMaterial(255, 0, 0);
-                model(house);
-                pop();
-
-                // HITBOX
-                push();
-                noFill();
-                translate(ObjArr[i].x, ObjArr[i].y, ObjArr[i].z);
-                box(ObjArr[i].sizeX, ObjArr[i].sizeY, ObjArr[i].sizeZ);
-                pop();
-            }
+            // HITBOX
+            push();
+            noFill();
+            translate(ObjArr[i].x, ObjArr[i].y, ObjArr[i].z);
+            box(ObjArr[i].sizeX, ObjArr[i].sizeY, ObjArr[i].sizeZ);
+            pop();
         }
     }
 
     vehs.forEach(function (veh) {
+
+        let colors = [
+            porscheColors.red,
+            porscheColors.green,
+            porscheColors.black,
+            porscheColors.yellow,
+            porscheColors.black,
+            porscheColors.white
+        ];
+
         push();
         translate(veh.getX(), veh.getY(), veh.getZ());
         rotateZ(PI);
         rotateY(veh.getAngle());
         scale(80);
         noStroke();
-        specularMaterial(255, 255, 0);
+        texture(colors[veh.getColor()]);
         model(car);
         pop();
 

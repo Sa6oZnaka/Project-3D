@@ -21,16 +21,17 @@ io.on('connection', function (socket) {
         'vehs': vehs,
     });
 
-    socket.on('spawn', function (username) {
+    socket.on('spawn', function (car) {
         let veh = {
-            'x': -600 + Math.random() * 300,
+            'x': -600 + Math.random() * 3000,
             'y': 120,
-            'z': Math.random() * 100,
+            'z': Math.random() * 1000,
             'sizeX': 200,
             'sizeY': 100,
             'sizeZ': 300,
             'angle': 30,
-            'type': "dynamic",
+            'color' : Math.floor(Math.random() * 6),
+            'type': "Porsche_911",
             'id': socket.id
         };
 

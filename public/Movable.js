@@ -1,8 +1,9 @@
 class Movable extends Building{
 
-    constructor(x, y, z, sizeX, sizeY, sizeZ, angle, type, id, speed){
+    constructor(x, y, z, sizeX, sizeY, sizeZ, angle, type, id, speed, color){
         super(x, y, z, sizeX, sizeY, sizeZ, angle, type, id);
 
+        this.color = color;
         this.speed = 0;
     }
 
@@ -31,4 +32,8 @@ class Movable extends Building{
         this.speed *= 0.993;
     }
 
-};
+    getColor() {
+        return this.color;
+    }
+
+}
